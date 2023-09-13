@@ -1,0 +1,13 @@
+workspace(name = "lowlevelapi")
+
+new_local_repository(
+    name = "zstd",
+    path = "/opt/homebrew",
+    build_file = "//thirdparty/zstd.BUILD.bazel"
+)
+
+new_local_repository(
+    name = "artl",
+    path = "//lib/artl",
+    build_file = "//lib/artl/artl.BUILD.bazel"
+)

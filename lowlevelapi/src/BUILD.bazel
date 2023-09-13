@@ -1,0 +1,19 @@
+cc_library(
+    name = "lowlevelapi",
+    srcs = ["lowlevelapi.c"],
+    hdrs = ["lowlevelapi.h"],
+    deps = [
+        "@artl//:artl",
+        "@zstd//:zstd",
+    ],
+)
+
+cc_binary(
+    name = "lowlevelapi_example",
+    srcs = ["lowlevelapi_example.c"],
+    deps = [
+        ":lowlevelapi",
+        "@artl//:artl",
+        "@zstd//:zstd",
+    ],
+)
