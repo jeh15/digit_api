@@ -1,0 +1,15 @@
+load("@rules_foreign_cc//foreign_cc:defs.bzl", "make")
+
+filegroup(
+    name = "srcs",
+    srcs = glob(["**"]),
+    visibility = ["//visibility:public"],
+)
+
+make(
+    name = "zstd",
+    lib_source = ":srcs",
+    alwayslink = True,
+    out_static_libs = ["libzstd.a"],
+    visibility = ["//visibility:public"],
+)

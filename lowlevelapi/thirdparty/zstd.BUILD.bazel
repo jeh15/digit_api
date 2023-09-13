@@ -1,5 +1,0 @@
-cc_import(
-    name = "zstd",
-    static_library = "lib/libzstd.a",
-    visibility = ["//visibility:public"],
-)
