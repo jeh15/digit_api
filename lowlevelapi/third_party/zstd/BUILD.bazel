@@ -1,15 +1,89 @@
-load("@rules_foreign_cc//foreign_cc:defs.bzl", "make")
+package(default_visibility = ["//visibility:public"])
 
-filegroup(
-    name = "srcs",
-    srcs = glob(["**"]),
-    visibility = ["//visibility:public"],
+cc_library(
+    name = "libzstd",
+    dep = [
+        ":common",
+        ":compress",
+        ":decompress",
+        ":deprecated",
+        ":dictBuilder",
+        ":zstd_header",
+        ":zdict_header",
+        ":zstd_errors",
+    ]
 )
 
-make(
-    name = "zstd",
-    lib_source = ":srcs",
-    alwayslink = True,
-    out_static_libs = ["libzstd.a"],
-    visibility = ["//visibility:public"],
+cc_library(
+    name = "zstd_header",
+    srcs = ["lib/zstd.h"],
+    strip_include_prefix = "lib",
+)
+
+cc_library(
+    name = "zdict_header",
+    srcs = ["lib/zdict.h"],
+    strip_include_prefix = "lib",
+)
+
+cc_library(
+    name = "zstd_errors",
+    srcs = ["lib/zstd_errors.h"],
+    strip_include_prefix = "lib",
+)
+
+cc_library(
+    name = "common",
+    srcs = glob(["lib/common/*.c"]),
+    hdrs = glob(["lib/common/*.h"]),
+    strip_include_prefix = "lib/common",
+    deps = [
+        ":zstd_header",
+        ":zstd_errors"
+    ],
+)
+
+cc_library(
+    name = "compress",
+    srcs = glob(["lib/compress/*.c"]),
+    hdrs = glob(["lib/compress/*.h"]),
+    strip_include_prefix = "lib/compress",
+    deps = [
+        ":common",
+        ":zstd_header",
+    ],
+)
+
+cc_library(
+    name = "decompress",
+    srcs = glob(["lib/decompress/*.c"]),
+    hdrs = glob(["lib/decompress/*.h"]),
+    strip_include_prefix = "lib/decompress",
+    deps = [
+        ":common",
+        ":zstd_header",
+    ],
+)
+
+cc_library(
+    name = "deprecated",
+    srcs = glob(["lib/deprecated/*.c"]),
+    hdrs = glob(["lib/deprecated/*.h"]),
+    strip_include_prefix = "lib/deprecated",
+    deps = [
+        ":common",
+        ":zstd_header",
+    ],
+)
+
+cc_library(
+    name = "dictBuilder",
+    srcs = glob(["lib/dictBuilder/*.c"]),
+    hdrs = glob(["lib/dictBuilder/*.h"]),
+    strip_include_prefix = "lib/dictBuilder",
+    deps = [
+        ":common",
+        ":compress",
+        ":zdict_header",
+    ],
 )
