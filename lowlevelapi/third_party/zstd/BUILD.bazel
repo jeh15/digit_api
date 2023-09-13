@@ -1,13 +1,21 @@
 load("@rules_foreign_cc//foreign_cc:defs.bzl", "make")
 
+# filegroup(
+#     name = "srcs",
+#     srcs = glob(["**"]),
+#     visibility = ["//visibility:public"],
+# )
+
 filegroup(
     name = "srcs",
-    srcs = glob(["**"]),
+    srcs = [
+        "@zstd//:Makefile",
+    ],
     visibility = ["//visibility:public"],
 )
 
 make(
-    name = "zstd",
+    name = "libzstd",
     lib_source = ":srcs",
     alwayslink = True,
     out_static_libs = ["libzstd.a"],
