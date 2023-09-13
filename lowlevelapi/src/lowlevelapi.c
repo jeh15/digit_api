@@ -21,7 +21,7 @@
  */
 
 #include "lowlevelapi.h"
-#include "libartl/artl.h"
+#include "include/artl/artl.h"
 #include <stdio.h>
 #include <string.h>
 

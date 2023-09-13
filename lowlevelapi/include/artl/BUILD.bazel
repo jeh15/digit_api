@@ -1,0 +1,32 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "artl",
+    srcs = [
+        "artl.c",
+        "artl_internal.c",
+        "crc32c.c",
+    ],
+    hdrs = [
+        "artl.h",
+        "artl_internal.h",
+        "crc32c.h",
+    ],
+    deps = [
+        "@zstd//:libzstd",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+# cc_binary(
+#     name = "libartl.so",
+#     deps = [
+#         ":artl",
+#     ],
+#     copts = [
+#         "-O2",
+#         "-Wall",
+#         "-Wextra",
+#         "-fPIC",
+#     ],
+# )

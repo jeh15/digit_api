@@ -19,5 +19,6 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 new_git_repository(
     name = "zstd",
     remote = "git@github.com:facebook/zstd.git",
-    build_file = "@//third_party/zstd:BUILD.bazel",
+    commit = "823b32ce430cd21706a5ffb5bd9e2e6297d919cc",
+    build_file = "//third_party/zstd:BUILD.bazel",
 )

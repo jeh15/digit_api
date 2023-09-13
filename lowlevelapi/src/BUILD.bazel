@@ -1,0 +1,19 @@
+package(default_visibility = ["//visibility:public"])
+
+cc_library(
+    name = "lowlevelapi",
+    srcs = ["lowlevelapi.c"],
+    hdrs = ["lowlevelapi.h"],
+    deps = [
+        "//include/artl:artl",
+        "@zstd//:libzstd",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+cc_binary(
+    name = "lowlevelapi_example",
+    srcs = ["lowlevelapi_example.c"],
+    deps = [":lowlevelapi"],
+    visibility = ["//visibility:public"],
+)
