@@ -56,8 +56,6 @@ python_configure(
   python_interpreter_target = interpreter,
 )
 
-print("Python interpreter: {}".format(interpreter))
-
 # ZSTD:
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
