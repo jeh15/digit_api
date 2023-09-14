@@ -1,5 +1,9 @@
 package(default_visibility = ["//visibility:public"])
 
+# Rules:
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
+
 cc_library(
     name = "lowlevelapi",
     srcs = ["lowlevelapi.c"],
@@ -15,5 +19,36 @@ cc_binary(
     name = "lowlevelapi_example",
     srcs = ["lowlevelapi_example.c"],
     deps = [":lowlevelapi"],
+    visibility = ["//visibility:public"],
+)
+
+# Compile C++ code into a shared library.
+pybind_library(
+    name = "example_cc_library",
+    srcs = ["example.cc"],
+    alwayslink = True,
+    visibility = ["//visibility:public"],
+)
+
+# Create a Python extension module from the C++ library.
+pybind_extension(
+    name = "example",
+    deps = [":example_cc_library"],
+    visibility = ["//visibility:public"],
+)
+
+# Create a Python library from shared file:
+py_library(
+    name = "example_py_library",
+    data = [":example.so"],
+    imports = ["."],
+    visibility = ["//visibility:public"],
+)
+
+# Create a Python binary that uses the py_library:
+py_binary(
+    name = "main",
+    srcs = ["main.py"],
+    deps = [":example_py_library"],
     visibility = ["//visibility:public"],
 )
