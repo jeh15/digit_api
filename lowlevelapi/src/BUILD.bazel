@@ -52,3 +52,36 @@ py_binary(
     deps = [":example_py_library"],
     visibility = ["//visibility:public"],
 )
+
+# Digits API:
+pybind_library(
+    name = "digitapi_cc_library",
+    srcs = ["digitapi_py.cc"],
+    deps = [
+        ":lowlevelapi",
+        "//include/artl:artl",
+        "@zstd//:libzstd",
+    ],
+    alwayslink = True,
+    visibility = ["//visibility:public"],
+)
+
+pybind_extension(
+    name = "digit_api",
+    deps = [":digitapi_cc_library"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "digitapi_py_library",
+    data = [":digit_api.so"],
+    imports = ["."],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "digit_api_test",
+    srcs = ["digit_api_test.py"],
+    deps = [":digitapi_py_library"],
+    visibility = ["//visibility:public"],
+)
