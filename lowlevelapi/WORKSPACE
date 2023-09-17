@@ -30,9 +30,20 @@ load("@python_3_10//:defs.bzl", "interpreter")
 
 load("@rules_python//python:pip.bzl", "pip_parse")
 
+# pip_parse(
+#     python_interpreter_target = interpreter,
+#     requirements = "//:requirements.txt",
+# )
+
 pip_parse(
-    python_interpreter_target = interpreter,
+  name = "my_deps",
+  python_interpreter_target = interpreter,
+  requirements = "//:requirements.txt",
 )
+# Load the starlark macro, which will define your dependencies.
+load("@my_deps//:requirements.bzl", "install_deps")
+# Call it to define repos for your requirements.
+install_deps()
 
 # Pybind11:
 http_archive(
@@ -56,6 +67,7 @@ python_configure(
   python_interpreter_target = interpreter,
 )
 
+
 # ZSTD:
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")
 
@@ -64,4 +76,12 @@ new_git_repository(
     remote = "git@github.com:facebook/zstd.git",
     commit = "823b32ce430cd21706a5ffb5bd9e2e6297d919cc",
     build_file = "//third_party/zstd:BUILD.bazel",
+)
+
+# Eigen:
+new_git_repository(
+    name = "eigen",
+    remote = "https://gitlab.com/libeigen/eigen.git",
+    commit = "3147391d946bb4b6c68edd901f2add6ac1f31f8c",
+    build_file = "//third_party/eigen:BUILD.bazel",
 )

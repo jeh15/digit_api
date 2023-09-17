@@ -4,6 +4,10 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
+# Custom pip requirements:
+load("@my_deps//:requirements.bzl", "requirement")
+
+
 cc_library(
     name = "lowlevelapi",
     srcs = ["lowlevelapi.c"],
@@ -53,6 +57,16 @@ py_binary(
     visibility = ["//visibility:public"],
 )
 
+# Eigen Example:
+cc_binary(
+    name = "eigen_example",
+    srcs = ["eigen_example.cc"],
+    deps = [
+        "@eigen//:eigen",
+    ],
+    visibility = ["//visibility:public"],
+)
+
 # Digits API:
 pybind_library(
     name = "digitapi_cc_library",
@@ -61,6 +75,7 @@ pybind_library(
         ":lowlevelapi",
         "//include/artl:artl",
         "@zstd//:libzstd",
+        "@eigen//:eigen",
     ],
     alwayslink = True,
     visibility = ["//visibility:public"],
@@ -82,6 +97,9 @@ py_library(
 py_binary(
     name = "digit_api_test",
     srcs = ["digit_api_test.py"],
-    deps = [":digitapi_py_library"],
+    deps = [
+        ":digitapi_py_library",
+        requirement("numpy"),
+    ],
     visibility = ["//visibility:public"],
 )
