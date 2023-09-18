@@ -1,4 +1,5 @@
 #include "lowlevelapi.h"
+#include "include/artl/artl.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/numpy.h>
@@ -8,25 +9,21 @@
 
 namespace py = pybind11;
 
+// TODO: Wrap this in namespace:
+
+// Local variables:
+llapi_command_t command = {0};
+llapi_observation_t observation;
+
 // connection function: Keep sending a message until a response is received.
+void llapi_wait_for_connection() {
+    // llapi_command_t command = {0};
+    // llapi_observation_t observation;
 
-
-// Wrapper for send command:
-// void wrapper_llapi_send_command(
-//     py::array_t<double, py::array::c_style | py::array::forcecast> array,
-//     int32_t fallback_opmode,
-//     bool apply_command
-// ) {
-//     // Map Numpy array to llapi_motor_t struct:
-//     llapi_command_t command = {0};
-//     for(int i = 0; i < NUM_MOTORS; i++) {
-//         command.motors[i].torque = array.at(i, 0);
-//         command.motors[i].velocity = array.at(i, 1);
-//         command.motors[i].damping = array.at(i, 2);
-
-//         std::cout << "Torque: " << command.motors[i].torque << std::endl;
-//     }
-// }
+    // Connect to robot (need to send commands until the subscriber connects)
+    command.apply_command = false;
+    while (!llapi_get_observation(&observation)) llapi_send_command(&command);
+}
 
 void wrapper_llapi_send_command(
     const Eigen::Ref<const Eigen::MatrixXd>& array,
@@ -34,7 +31,7 @@ void wrapper_llapi_send_command(
     bool apply_command
 ) {
     // Map Numpy array to llapi_motor_t struct:
-    llapi_command_t command = {0};
+    // llapi_command_t command = {0};
     for(int i = 0; i < NUM_MOTORS; i++) {
         command.motors[i].torque = array(i, 0);
         command.motors[i].velocity = array(i, 1);
@@ -45,6 +42,106 @@ void wrapper_llapi_send_command(
 
     // Send command:
     llapi_send_command(&command);
+}
+
+// Create a wrappers for observation struct:
+// TODO(jeh15): 
+//  1. Error Handling
+//  2. Create structure mapping for observation struct instead of individual wrapper functions.
+
+// Get positions of actuated joints:
+py::array_t<double> wrapper_llapi_get_observation_actuated_joints_position(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto position = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        position(i) = observation.motor.position[i];
+    }
+    return np_array;
+}
+
+// Get velocities of actuated joints:
+py::array_t<double> wrapper_llapi_get_observation_actuated_joints_velocity(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto velocity = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        velocity(i) = observation.motor.velocity[i];
+    }
+    return np_array;
+}
+
+// Get torques of actuated joints:
+py::array_t<double> wrapper_llapi_get_observation_actuated_joints_torque(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto torque = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        torque(i) = observation.motor.torque[i];
+    }
+    return np_array;
+}
+
+// Get positions of unactuated joints:
+py::array_t<double> wrapper_llapi_get_observation_unactuated_joints_position(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_JOINTS);
+    auto position = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < NUM_JOINTS; i++) {
+        position(i) = observation.joint.position[i];
+    }
+    return np_array;
+}
+
+// Get velocities of inactuated joints:
+py::array_t<double> wrapper_llapi_get_observation_unactuated_joints_velocity(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_JOINTS);
+    auto velocity = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < NUM_JOINTS; i++) {
+        velocity(i) = observation.joint.velocity[i];
+    }
+    return np_array;
+}
+
+
+// Wrapper for limit struct:
+py::array_t<double> wrapper_llapi_get_limits_torque(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto limits = np_array.mutable_unchecked<1>();
+    const llapi_limits_t* limits_ptr = llapi_get_limits();
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        limits(i) = limits_ptr->torque_limit[i];
+    }
+    return np_array;
+}
+
+py::array_t<double> wrapper_llapi_get_limits_damping(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto limits = np_array.mutable_unchecked<1>();
+    const llapi_limits_t* limits_ptr = llapi_get_limits();
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        limits(i) = limits_ptr->damping_limit[i];
+    }
+    return np_array;
+}
+
+py::array_t<double> wrapper_llapi_get_limits_velocity(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(NUM_MOTORS);
+    auto limits = np_array.mutable_unchecked<1>();
+    const llapi_limits_t* limits_ptr = llapi_get_limits();
+    for(int i = 0; i < NUM_MOTORS; i++) {
+        limits(i) = limits_ptr->velocity_limit[i];
+    }
+    return np_array;
 }
 
 PYBIND11_MODULE(digit_api, m) {
@@ -60,14 +157,30 @@ PYBIND11_MODULE(digit_api, m) {
         "check_connection", &llapi_connected, "Returns true if the subscriber is connected to Digit."
     );
 
-    // Get and Send Functions:
     m.def(
-        "get_states", &llapi_get_observation, "Returns a copy of Digit's current states."
+        "wait_for_connection", &llapi_wait_for_connection, "Waits for subscriber to connect."
     );
 
-    // m.def(
-    //     "send_command", &llapi_send_command, "Sends a command to Digit."
-    // );
+    // Get and Send Functions:
+    m.def(
+        "get_actuated_joint_position", &wrapper_llapi_get_observation_actuated_joints_position, "Returns a copy of Digit's current states."
+    );
+
+    m.def(
+        "get_actuated_joint_velocity", &wrapper_llapi_get_observation_actuated_joints_velocity, "Returns a copy of Digit's current states."
+    );
+
+    m.def(
+        "get_actuated_joint_torque", &wrapper_llapi_get_observation_actuated_joints_torque, "Returns a copy of Digit's current states."
+    );
+
+    m.def(
+        "get_unactuated_joint_position", &wrapper_llapi_get_observation_unactuated_joints_position, "Returns a copy of Digit's current states."
+    );
+
+    m.def(
+        "get_unactuated_joint_velocity", &wrapper_llapi_get_observation_unactuated_joints_velocity, "Returns a copy of Digit's current states."
+    );
 
     m.def(
         "send_command", &wrapper_llapi_send_command, "Sends a command to Digit."
@@ -75,19 +188,15 @@ PYBIND11_MODULE(digit_api, m) {
 
     // Limit Functions:
     m.def(
-        "get_limits", &llapi_get_limits, "Returns a copy of Digit's command limits."
+        "get_torque_limits", &wrapper_llapi_get_limits_torque, "Returns a copy of Digit's command limits."
     );
 
-    // py::class_<llapi_motor_t>(m, "Motor")
-    //     .def(py::init<>())
-    //     .def_readwrite("torque", &llapi_motor_t::torque)
-    //     .def_readwrite("velocity", &llapi_motor_t::velocity)
-    //     .def_readwrite("damping", &llapi_motor_t::damping);
+    m.def(
+        "get_damping_limits", &wrapper_llapi_get_limits_damping, "Returns a copy of Digit's command limits."
+    );
 
-    // py::class_<llapi_command_t>(m, "Command")
-    //     .def(py::init<>())
-    //     .def_readwrite("motors", &llapi_command_t::motors)
-    //     .def_readwrite("fallback_opmode", &llapi_command_t::fallback_opmode)
-    //     .def_readwrite("apply_command", &llapi_command_t::apply_command);
-    
+    m.def(
+        "get_velocity_limits", &wrapper_llapi_get_limits_velocity, "Returns a copy of Digit's command limits."
+    );
+
 }
