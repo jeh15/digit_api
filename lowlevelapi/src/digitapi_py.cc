@@ -150,7 +150,7 @@ PYBIND11_MODULE(digit_api, m) {
     // Communication Functions:
     m.def(
         "initialize_communication", &llapi_init_custom, "Starts subscriber and publisher communication.",
-        py::arg("publisher_address"), py::arg("subscriber_port") = 25501, py::arg("publisher_port") =25500
+        py::arg("publisher_address"), py::arg("subscriber_port") = 25501, py::arg("publisher_port") = 25500
     );
 
     m.def(
