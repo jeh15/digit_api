@@ -27,6 +27,12 @@ python_register_toolchains(
 )
 
 load("@python_3_10//:defs.bzl", "interpreter")
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+  python_interpreter_target = interpreter,
+)
+
 
 # Pybind11:
 http_archive(
@@ -49,7 +55,6 @@ python_configure(
   name = "local_config_python",
   python_interpreter_target = interpreter,
 )
-
 
 # ZSTD:
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "new_git_repository")

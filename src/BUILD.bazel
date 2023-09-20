@@ -4,7 +4,6 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
-
 cc_library(
     name = "lowlevelapi",
     srcs = ["lowlevelapi.c"],
