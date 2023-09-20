@@ -11,24 +11,24 @@ cc_library(
         ":zstd_header",
         ":zdict_header",
         ":zstd_errors",
-    ]
+    ],
 )
 
 cc_library(
     name = "zstd_header",
-    srcs = ["lib/zstd.h"],
+    hdrs = ["lib/zstd.h"],
     strip_include_prefix = "lib",
 )
 
 cc_library(
     name = "zdict_header",
-    srcs = ["lib/zdict.h"],
+    hdrs = ["lib/zdict.h"],
     strip_include_prefix = "lib",
 )
 
 cc_library(
     name = "zstd_errors",
-    srcs = ["lib/zstd_errors.h"],
+    hdrs = ["lib/zstd_errors.h"],
     strip_include_prefix = "lib",
 )
 

@@ -17,16 +17,3 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
 )
-
-# cc_binary(
-#     name = "libartl.so",
-#     deps = [
-#         ":artl",
-#     ],
-#     copts = [
-#         "-O2",
-#         "-Wall",
-#         "-Wextra",
-#         "-fPIC",
-#     ],
-# )
