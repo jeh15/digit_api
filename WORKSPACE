@@ -27,16 +27,6 @@ python_register_toolchains(
 )
 
 load("@python_3_10//:defs.bzl", "interpreter")
-load("@rules_python//python:pip.bzl", "pip_parse")
-
-pip_parse(
-  name = "my_deps",
-  python_interpreter_target = interpreter,
-  requirements = "//:requirements.txt",
-)
-
-load("@my_deps//:requirements.bzl", "install_deps")
-install_deps()
 
 # Pybind11:
 http_archive(

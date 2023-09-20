@@ -4,9 +4,6 @@ package(default_visibility = ["//visibility:public"])
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@pybind11_bazel//:build_defs.bzl", "pybind_extension", "pybind_library")
 
-# Custom pip requirements:
-load("@my_deps//:requirements.bzl", "requirement")
-
 
 cc_library(
     name = "lowlevelapi",
@@ -91,28 +88,5 @@ py_library(
     name = "digitapi_py_library",
     data = [":digit_api.so"],
     imports = ["."],
-    visibility = ["//visibility:public"],
-)
-
-# Digit Example: Pythond Bindings
-py_binary(
-    name = "digit_api_test",
-    srcs = ["digit_api_test.py"],
-    deps = [
-        ":digitapi_py_library",
-        requirement("numpy"),
-    ],
-    visibility = ["//visibility:public"],
-)
-
-# Digit Example: Drake
-py_binary(
-    name = "drake_example",
-    srcs = ["drake_example.py"],
-    deps = [
-        ":digitapi_py_library",
-        requirement("numpy"),
-        requirement("drake"),
-    ],
     visibility = ["//visibility:public"],
 )
