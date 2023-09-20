@@ -78,30 +78,3 @@ new_git_repository(
     commit = "3147391d946bb4b6c68edd901f2add6ac1f31f8c",
     build_file = "//third_party/eigen:BUILD.bazel",
 )
-
-# Drake:
-DRAKE_COMMIT = "v1.20.0"
-DRAKE_CHECKSUM = "e343bc558f840be17c05053c6fc3fff899a3bf4540f3b285f6cd7ca5937f7b46"
-
-# Load an environment variable.
-load("//:environ.bzl", "environ_repository")
-environ_repository(name = "environ", vars = ["EXAMPLES_LOCAL_DRAKE_PATH"])
-load("@environ//:environ.bzl", EXAMPLES_LOCAL_DRAKE_PATH = "EXAMPLES_LOCAL_DRAKE_PATH")
-
-http_archive(
-    name = "drake" if not EXAMPLES_LOCAL_DRAKE_PATH else "drake_ignored",
-    urls = [x.format(DRAKE_COMMIT) for x in [
-        "https://github.com/RobotLocomotion/drake/archive/{}.tar.gz",
-    ]],
-    sha256 = DRAKE_CHECKSUM,
-    strip_prefix = "drake-{}".format(DRAKE_COMMIT.lstrip("v")),
-)
-
-local_repository(
-    name = "drake" if EXAMPLES_LOCAL_DRAKE_PATH else "drake_ignored",
-    path = EXAMPLES_LOCAL_DRAKE_PATH,
-)
-print("Using EXAMPLES_LOCAL_DRAKE_PATH={}".format(EXAMPLES_LOCAL_DRAKE_PATH)) if EXAMPLES_LOCAL_DRAKE_PATH else None  # noqa
-
-load("@drake//tools/workspace:default.bzl", "add_default_workspace")
-add_default_workspace()
