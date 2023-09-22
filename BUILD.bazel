@@ -1,1 +1,20 @@
 package(default_visibility = ["//visibility:public"])
+load("@rules_python//python:packaging.bzl", "py_package", "py_wheel")
+
+# Use py_package to collect all transitive dependencies of a target,
+# selecting just the files within a specific python package.
+py_package(
+    name = "digitapi_pkg",
+    # Only include these Python packages.
+    packages = ["digitapi.wheel"],
+    deps = ["//src:digitapi_py_library"],
+)
+
+py_wheel(
+    name = "digitapi",
+    # Package data. We're building "example_minimal_package-0.0.1-py3-none-any.whl"
+    distribution = "digitapi",
+    python_tag = "py3",
+    version = "0.0.1",
+    deps = [":digitapi_pkg"],
+)
