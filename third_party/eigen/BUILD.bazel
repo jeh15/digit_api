@@ -1,3 +1,5 @@
+package(default_visibility = ["//visibility:public"])
+
 EIGEN_FILES = [
     "Eigen/**",
     "unsupported/Eigen/CXX11/**",
