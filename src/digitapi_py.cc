@@ -109,6 +109,55 @@ py::array_t<double> wrapper_llapi_get_observation_unactuated_joints_velocity(){
     return np_array;
 }
 
+// Get position of the base:
+py::array_t<double> wrapper_llapi_get_base_frame_position(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(3);
+    auto position = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < 3; i++) {
+        position(i) = observation.base.translation[i];
+    }
+    return np_array;
+}
+
+// Get orientation of the base:
+py::array_t<double> wrapper_llapi_get_base_frame_orientation(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(4);
+    auto quaternion = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    // Direct mapping:
+    quaternion(0) = observation.base.orientation.w;
+    quaternion(1) = observation.base.orientation.x;
+    quaternion(2) = observation.base.orientation.y;
+    quaternion(3) = observation.base.orientation.z;
+    return np_array;
+}
+
+// Get linear velocity of the base:
+py::array_t<double> wrapper_llapi_get_base_frame_linear_velocity(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(3);
+    auto linear_velocity = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < 3; i++) {
+        linear_velocity(i) = observation.base.linear_velocity[i];
+    }
+    return np_array;
+}
+
+// Get angular velocity of the base:
+py::array_t<double> wrapper_llapi_get_base_frame_angular_velocity(){
+    // Get Updated Observations:
+    py::array_t<double> np_array(3);
+    auto angular_velocity = np_array.mutable_unchecked<1>();
+    int return_val = llapi_get_observation(&observation);
+    for(int i = 0; i < 3; i++) {
+        angular_velocity(i) = observation.base.angular_velocity[i];
+    }
+    return np_array;
+}
 
 // Wrapper for limit struct:
 py::array_t<double> wrapper_llapi_get_limits_torque(){
@@ -143,6 +192,17 @@ py::array_t<double> wrapper_llapi_get_limits_velocity(){
     }
     return np_array;
 }
+
+// // TEST Bind struct:
+// class observation_object {
+//     public:
+//         observation_object() {}
+//         llapi_observation_t observation;
+//         int update() {
+//             int return_val = llapi_get_observation(&observation);
+//             return return_val
+//         }
+// }
 
 PYBIND11_MODULE(digit_api, m) {
     m.doc() = "Python bindings for Digit's low level api.";
@@ -186,6 +246,23 @@ PYBIND11_MODULE(digit_api, m) {
         "send_command", &wrapper_llapi_send_command, "Sends a command to Digit."
     );
 
+    // Base Frame Functions:
+    m.def(
+        "get_base_position", &wrapper_llapi_get_base_frame_position, "Returns a copy of the postion of Digit's Base relative to the World."
+    );
+
+    m.def(
+        "get_base_orientation", &wrapper_llapi_get_base_frame_orientation, "Returns a copy of the orientation of Digit's Base relative to the world representated as a quaternion."
+    );
+
+    m.def(
+        "get_base_linear_velocity", &wrapper_llapi_get_base_frame_linear_velocity, "Returns a copy of the linear velocity of Digit's Base relative to the world."
+    );
+
+    m.def(
+        "get_base_angular_velocity", &wrapper_llapi_get_base_frame_angular_velocity, "Returns a copy of the angular velocity of Digit's Base relative to the world."
+    );
+
     // Limit Functions:
     m.def(
         "get_torque_limits", &wrapper_llapi_get_limits_torque, "Returns a copy of Digit's command limits."
@@ -198,5 +275,10 @@ PYBIND11_MODULE(digit_api, m) {
     m.def(
         "get_velocity_limits", &wrapper_llapi_get_limits_velocity, "Returns a copy of Digit's command limits."
     );
-
+    
+    // Trying to bind a wrapper class:
+    // py::class_<observation_object>(m, "observation_object")
+    //     .def(py::init<>())
+    //     .def("update", &observation_object::update)
+    //     .def_readwrite("joint_position", &observation_object::observation::joint::position)
 }
